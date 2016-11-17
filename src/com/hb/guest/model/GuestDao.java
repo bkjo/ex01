@@ -17,7 +17,7 @@ public class GuestDao {
 	public GuestDao() throws Exception {
 		Class.forName("org.h2.Driver");
 		conn=DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test"
-				, "sa", "");
+				, "scott", "tiger");
 	}
 	
 	public void insertOne(GuestDto dto) throws IllegalArgumentException,SQLException{
@@ -35,10 +35,32 @@ public class GuestDao {
 		
 	}
 	
-	public ArrayList selectAll() throws SQLException{
-		ArrayList list = new ArrayList();
+	public GuestDto selectOne(int sabun) throws SQLException{
+		String sql="SELECT * FROM GUEST WHERE SABUN=?";
+
+		GuestDto dto=null;
 		
+		pstmt=conn.prepareStatement(sql);
+		pstmt.setInt(1, sabun);
+		rs=pstmt.executeQuery();
+		
+		if(rs.next()){
+			dto = new GuestDto();
+			dto.setSabun(rs.getInt("sabun"));
+			dto.setName(rs.getString("name"));
+			dto.setNalja(rs.getDate("nalja"));
+			dto.setPay(rs.getInt("pay"));
+		}
+		if(rs!=null)rs.close();
+		if(pstmt!=null)pstmt.close();
+		if(conn!=null)conn.close();
+		
+		return dto;
+	}
+	public ArrayList selectAll() throws SQLException{
 		String sql="SELECT * FROM GUEST";
+		
+		ArrayList list = new ArrayList();
 		pstmt=conn.prepareStatement(sql);
 		rs=pstmt.executeQuery();
 		
@@ -55,5 +77,31 @@ public class GuestDao {
 		if(conn!=null)conn.close();
 		
 		return list;
+	}
+
+	public void updateOne(GuestDto dto) throws SQLException {
+		String sql = "UPDATE GUEST SET NAME=?,PAY=? WHERE SABUN=?";
+		try{
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, dto.getName());
+			pstmt.setInt(2, dto.getPay());
+			pstmt.setInt(3, dto.getSabun());
+			pstmt.executeUpdate();
+		}finally{
+			if(pstmt!=null)pstmt.close();
+			if(conn!=null)conn.close();
+		}
+	}
+
+	public void deleteOne(int sabun) throws SQLException {
+		String sql = "DELETE FROM GUEST WHERE SABUN=?";
+		try{
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, sabun);
+			pstmt.executeUpdate();
+		}finally{
+			if(pstmt!=null)pstmt.close();
+			if(conn!=null)conn.close();
+		}
 	}
 }

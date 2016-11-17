@@ -11,24 +11,25 @@ import javax.servlet.http.HttpServletResponse;
 import com.hb.guest.model.GuestDao;
 import com.hb.guest.model.GuestDto;
 
-
 @WebServlet("/guest/detail.do")
 public class DetailController extends HttpServlet {
 
-	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		int sabun = Integer.parseInt(request.getParameter("idx"));
 		
-		GuestDao dao = null;
-		GuestDto dto = new GuestDto();
+		String param=request.getParameter("idx");
+		int sabun=Integer.parseInt(param);
+		
+		GuestDao dao=null;
+		
 		try {
-			dao = new GuestDao();
-			dto = dao.detail(sabun);
+			dao= new GuestDao();
+			GuestDto dto=dao.selectOne(sabun);
+			request.setAttribute("bean", dto);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		request.setAttribute("alist", dto);
-		request.getRequestDispatcher("detail.jsp").forward(request, response);
+		
+		request.getRequestDispatcher("/WEB-INF/guest/detail.jsp").forward(request, response);
 	}
 
 }
