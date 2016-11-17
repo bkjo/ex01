@@ -17,7 +17,7 @@ public class GuestDao {
 	public GuestDao() throws Exception {
 		Class.forName("org.h2.Driver");
 		conn=DriverManager.getConnection("jdbc:h2:tcp://localhost/~/test"
-				, "scott", "tiger");
+				, "sa", "");
 	}
 	
 	public void insertOne(GuestDto dto) throws IllegalArgumentException,SQLException{
@@ -103,5 +103,21 @@ public class GuestDao {
 			if(pstmt!=null)pstmt.close();
 			if(conn!=null)conn.close();
 		}
+	}
+
+	public boolean loginChk(int sabun, String name) throws SQLException {
+		String sql ="select count(*) as cnt from guest where sabun=? and name=?";
+		int result=0;
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, sabun);
+		pstmt.setString(2, name);
+		rs=pstmt.executeQuery();
+		if(rs.next()){
+			result = rs.getInt("cnt");
+		}
+		if(result>0){
+			return true;
+		}
+		return false;
 	}
 }
